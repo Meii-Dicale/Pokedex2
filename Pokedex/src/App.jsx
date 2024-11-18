@@ -3,6 +3,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import NavBar from './Components/NavBar';
 import PokemonPage from './Pages/Pokemons';
+import PokedexPage from './Pages/Pokedex';
 
 
 
@@ -13,6 +14,8 @@ function App() {
               <NavBar/>
               <Routes >
               <Route path="/pokemons" element={<PokemonPage />} />
+              <Route path="/pokemon/:name" element={<PokedexPage />} />
+              
               </Routes>
           </BrowserRouter >
 
