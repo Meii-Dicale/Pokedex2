@@ -1,4 +1,6 @@
+import { useEffect } from 'react';
 import '../App.css';
+import axios from 'axios';
 
 
 
@@ -9,7 +11,17 @@ function Pokedex({ PokeDetail }) {
   }
   const stats = PokeDetail.stats;
   const types = PokeDetail.types;
+  const games = PokeDetail.game_indices;
 
+  const fetchPokemonType = async () => {
+    const typeInfo = await axios.get(`https://pokeapi.co/api/v2/type/${types[0].type.name}`);
+    
+    console.log(typeInfo.data)
+   
+  }
+  
+  useEffect(() => {
+    fetchPokemonType();})   
 
 
   return (
@@ -116,7 +128,8 @@ function Pokedex({ PokeDetail }) {
        
       }}>
         {types.map((type, index) => (
-          <button style = {{
+          <button 
+          style = {{
             borderRadius: "5px"
           }}key={index} className={type.type.name}>
             {type.type.name}
@@ -135,6 +148,26 @@ function Pokedex({ PokeDetail }) {
         fontWeight: "bold"
       }}>
         {"N°"}{PokeDetail.id}
+      </div>
+      <div
+      style={{
+        position: "absolute",
+        top: "620px",
+        left: "480px",
+        fontSize: "14px",
+        width : "450px"
+        
+      }}>
+      {games.map((game, index) => (
+          <button 
+          style = {{
+            borderRadius: "5px"
+          }}key={index} className={game.version.name}>
+            {game.version.name}
+          </button>
+           
+           
+            ))}
       </div>
     </>
   );
