@@ -64,7 +64,22 @@ function Pokedex({ PokeDetail }) {
       );
   }}
 />
-
+<div
+style={{
+    position: "absolute",
+    top: "165px",
+    left: "430px",
+    fontSize: "14px",
+    zIndex: "-5"
+  
+}}>
+    <img style={{
+        width: "610px",
+    
+  
+    }}
+    src="../img/pokedex2.png" alt="pokedex" />
+</div>
       </div>
       <div
         style={{
@@ -72,7 +87,8 @@ function Pokedex({ PokeDetail }) {
           top: "100px",
           left: "800px",
           fontSize: "26px",
-          color: "white"
+          color: "white",
+          width: "300px"
         }}
       >
         {PokeDetail.name.toUpperCase()}
@@ -87,6 +103,7 @@ function Pokedex({ PokeDetail }) {
             display: "flex column",
             font: "bold 11px ",
             lineHeight: "1px",
+            width: "300px"
             
             
             
@@ -233,6 +250,32 @@ function Pokedex({ PokeDetail }) {
  
           
       </div>
+      <div
+  style={{
+    position: "absolute",
+    top: "480px",
+    left: "1050px",
+    display: "flex",
+    flexDirection: "column",
+  }}
+>
+  {evolve?.evolves_from_species?.name && (
+    <>
+      <h3>I am the evolution of:</h3>
+      <img
+        style={{
+          width: "100px",
+          height: "100px",
+          margin: "10px",
+        }}
+        src={`https://img.pokemondb.net/artwork/${evolve.evolves_from_species.name}.jpg`}
+        alt={`Evolution of ${evolve.evolves_from_species.name}`}
+      />
+      <h4>{evolve.evolves_from_species.name.toUpperCase()}</h4>
+    </>
+  )}
+      </div>
+
 
     </>
   );

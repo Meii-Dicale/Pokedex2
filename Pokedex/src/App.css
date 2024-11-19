@@ -1,10 +1,4 @@
-.pokedex-bg {
-background-image: url('../img/pokedex2.png');
-background-size: 600px;
-background-position: center;
-background-repeat: no-repeat;
-height: 600px
-};
+
 .hoverPokemon {
     width: 150px;
     position: absolute;

@@ -20,16 +20,20 @@ function NavBar() {
         <Navbar.Brand >
           <Link to={'/pokemons'} >
           <img
-            style={{ width: "200px" }}
+            style={{ width: "200px",
+              position: "relative",
+              top: "5px",
+              left: "-10px"
+            }}
             src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/98/International_Pokémon_logo.svg/1024px-International_Pokémon_logo.svg.png"
             alt="Pokémon Logo"
+            className='hoverPokemon'
           /></Link>
         </Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="me-auto">
-            <Nav.Link href="#home"> <Link to={'/pokedex'}>Pokedex </Link></Nav.Link>
-            <Nav.Link href="#link">Link</Nav.Link>
+
           </Nav>
           <div className="d-flex">
             <input
