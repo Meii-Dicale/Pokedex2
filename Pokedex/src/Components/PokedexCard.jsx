@@ -16,20 +16,35 @@ function Pokedex({ PokeDetail }) {
   const [damage, setDamage] = useState ();
   const [UrlImage , setUrlImage] = useState ("");
   const [evolve, setEvolve] = useState ();
+  const [Evolution, setEvolution] = useState();
+  const [Evolution2, setEvolution2] = useState();
 
 
   const fetchPokemonType = async () => {
     const typeInfo = await axios.get(`https://pokeapi.co/api/v2/type/${types[0].type.name}`);
     setDamage(typeInfo.data);
     //console.log(typeInfo.data)
-    console.log(PokeDetail)
+    //console.log(PokeDetail)
     setUrlImage(`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${PokeDetail.id}.png`);
    
   }
   const fetchPokemonEvolution = async () => {
-    const Evolution = await axios.get(`https://pokeapi.co/api/v2/pokemon-species/${PokeDetail.id}/`);
-    setEvolve(Evolution.data);
-    console.log(Evolution.data)
+    const Evolutions = await axios.get(`https://pokeapi.co/api/v2/pokemon-species/${PokeDetail.id}/`);
+    setEvolve(Evolutions.data);
+    fetchPokemonEvolutionType(Evolutions.data);
+    //
+  }
+
+  const fetchPokemonEvolutionType  = async (evolve) => {
+    
+    if (evolve.evolution_chain) {
+      const response = await axios.get(evolve.evolution_chain.url);
+      const evolutionType = await axios.get(response.data.chain.evolves_to[0].evolves_to[0].species.url);
+      const evolutionType2 = await axios.get(response.data.chain.evolves_to[0].species.url)
+      console.log(response.data.chain)
+      setEvolution(evolutionType.data.name)
+      setEvolution2(evolutionType2.data.name)
+    }
   }
 
 
@@ -147,7 +162,7 @@ style={{
       <div
         style={{
           position: "absolute",
-          top: "300px",
+          top: "110px",
           left: "1050px",
           fontSize: "12px",
           color: "black"
@@ -253,7 +268,7 @@ style={{
       <div
   style={{
     position: "absolute",
-    top: "480px",
+    top: "280px",
     left: "1050px",
     display: "flex",
     flexDirection: "column",
@@ -264,8 +279,8 @@ style={{
       <h3>I am the evolution of:</h3>
       <img
         style={{
-          width: "100px",
-          height: "100px",
+          width: "80px",
+          height: "80px",
           margin: "10px",
         }}
         src={`https://img.pokemondb.net/artwork/${evolve.evolves_from_species.name}.jpg`}
@@ -274,8 +289,60 @@ style={{
       <h4>{evolve.evolves_from_species.name.toUpperCase()}</h4>
     </>
   )}
-      </div>
+      </div><div style={{
+        display: "flex",
+        flexDirection: "column",
 
+      }}>
+      <div style={{
+        position: "absolute",
+        top: "450px",
+        left: "1050px",
+        display: "flex",
+        flexDirection: "column",
+        gap: "10px",    
+      }}>
+{Evolution2 && PokeDetail && Evolution2 !== PokeDetail.name && (
+  <>
+    <h3>I can evolve into:</h3>
+    <div>
+      <img
+        style={{
+          width: "80px",
+          height: "80px",
+          margin: "10px",
+        }}
+        src={`https://img.pokemondb.net/artwork/${Evolution2}.jpg`}
+        alt={`Evolution of ${Evolution2}`}
+        onClick={() => navigate(`/pokemon/${PokeDetail.id}`, { state: { evolutionName: Evolution2 } })}
+      />
+      <h4>{Evolution2.toUpperCase()}</h4>
+    </div>
+  </>
+)}
+
+{Evolution && PokeDetail && Evolution !== PokeDetail.name && (
+  <>
+    <h3>I can evolve into:</h3>
+    <div>
+      <img
+        style={{
+          width: "80px",
+          height: "80px",
+          margin: "10px",
+        }}
+        src={`https://img.pokemondb.net/artwork/${Evolution}.jpg`}
+        alt={`Evolution of ${Evolution}`}
+        onClick={() => navigate(`/pokemon/${PokeDetail.id}`, { state: { evolutionName: Evolution } })}
+      />
+      <h4>{Evolution2.toUpperCase()}</h4>
+    </div>
+  </>
+)}
+
+
+      </div>
+      </div>
 
     </>
   );

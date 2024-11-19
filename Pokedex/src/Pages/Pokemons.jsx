@@ -7,7 +7,7 @@ import Pagination from "react-bootstrap/esm/Pagination";
 
 const PokemonPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
-  const [limit, setLimit] = useState(21);
+  const [limit, setLimit] = useState(200);
   const [maxPage, setMaxPage] = useState(250);
   const [pokemons, setPokemons] = useState([]);
   const [searchParams] = useSearchParams(); // Utilisez les paramètres de recherche
