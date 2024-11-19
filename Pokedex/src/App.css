@@ -5,7 +5,18 @@ background-position: center;
 background-repeat: no-repeat;
 height: 600px
 };
+.hoverPokemon {
+    width: 150px;
+    position: absolute;
 
+    transition: transform 0.2s ease-in-out; /* Pour un effet fluide */
+  }
+  
+  .hoverPokemon:hover {
+    cursor: pointer;
+    transform: scale(1.1);
+  }
+  
 .position-pokedex {
     position: relative;
     top: 30000px; /* Décale vers le bas */
@@ -288,3 +299,4 @@ a{
 .shield {
   background-color: var(--pokemon-color-Shield);
 }
+

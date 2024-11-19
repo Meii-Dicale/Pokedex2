@@ -1,6 +1,7 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import '../App.css';
 import axios from 'axios';
+
 
 
 
@@ -12,31 +13,58 @@ function Pokedex({ PokeDetail }) {
   const stats = PokeDetail.stats;
   const types = PokeDetail.types;
   const games = PokeDetail.game_indices;
+  const [damage, setDamage] = useState ();
+  const [UrlImage , setUrlImage] = useState ("");
+  const [evolve, setEvolve] = useState ();
+
 
   const fetchPokemonType = async () => {
     const typeInfo = await axios.get(`https://pokeapi.co/api/v2/type/${types[0].type.name}`);
-    
-    console.log(typeInfo.data)
+    setDamage(typeInfo.data);
+    //console.log(typeInfo.data)
+    console.log(PokeDetail)
+    setUrlImage(`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${PokeDetail.id}.png`);
    
   }
-  
+  const fetchPokemonEvolution = async () => {
+    const Evolution = await axios.get(`https://pokeapi.co/api/v2/pokemon-species/${PokeDetail.id}/`);
+    setEvolve(Evolution.data);
+    console.log(Evolution.data)
+  }
+
+
   useEffect(() => {
-    fetchPokemonType();})   
+    fetchPokemonType();
+    fetchPokemonEvolution();
+},[])   
 
 
   return (
     <>
-      <div>
-        <img
-          style={{
-            width: "150px",
-            position: "relative",
-            top: "210px",
-            left: "520px"
-          }}
-          src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${PokeDetail.id}.png`}
-          alt={PokeDetail.name}
-        />
+      <div  >
+      <img
+      style={{
+        width: "150px",
+        position: "relative",
+        top: "210px",
+        left: "520px"
+        
+      }}
+  className="hoverPokemon"
+  src={UrlImage}
+  alt={PokeDetail.name}
+  onClick={() => {
+    if (UrlImage.includes("back"))
+      setUrlImage(
+        `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${PokeDetail.id}.png`
+      );
+    else
+      setUrlImage(
+        `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/${PokeDetail.id}.png`
+      );
+  }}
+/>
+
       </div>
       <div
         style={{
@@ -158,6 +186,7 @@ function Pokedex({ PokeDetail }) {
         width : "450px"
         
       }}>
+        <h5>Includes in games :</h5>
       {games.map((game, index) => (
           <button 
           style = {{
@@ -169,6 +198,42 @@ function Pokedex({ PokeDetail }) {
            
             ))}
       </div>
+      <div
+              style={{
+                position: "absolute",
+                top: "300px",
+                left:"20px" }}>
+   
+
+      <h3>Weakness :</h3>
+      {damage && damage.damage_relations.double_damage_from.map((doubleDamage)=> (
+                <button key={doubleDamage.name} className={doubleDamage.name}>{doubleDamage.name}</button>
+                
+
+              ))}
+              <h3> Strong to :</h3>
+              {damage && damage.damage_relations.double_damage_to.map((doubleDamage)=> (
+                <button key={doubleDamage.name} className={doubleDamage.name}>{doubleDamage.name}</button>
+                
+
+              ))}
+              <h3> Half damage to :</h3>
+              {damage && damage.damage_relations.half_damage_to.map((doubleDamage)=> (
+                <button key={doubleDamage.name} className={doubleDamage.name}>{doubleDamage.name}</button>
+                
+
+              ))}
+                   <h3> Half damage from :</h3>
+              {damage && damage.damage_relations.half_damage_from.map((doubleDamage)=> (
+                <button key={doubleDamage.name} className={doubleDamage.name}>{doubleDamage.name}</button>
+                
+
+              ))}
+
+ 
+          
+      </div>
+
     </>
   );
 }
