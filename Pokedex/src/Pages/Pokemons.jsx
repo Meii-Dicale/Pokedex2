@@ -54,13 +54,14 @@ const PokemonPage = () => {
 
   return (
     <>
-      <div className="background-container">
+     
         <Container>
+        <h1 style={{ textAlign: "center"}}>You can check out all the Pokemon here!</h1>
           {/* Barre de recherche */}
           <div className="d-flex justify-content-center mt-4">
             <Form.Control
               type="text"
-              placeholder="Rechercher un Pokémon..."
+              placeholder="Search a Pokemon..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="search-bar w-50"
@@ -68,7 +69,7 @@ const PokemonPage = () => {
           </div>
 
           {/* Liste des Pokémon */}
-          <div className="d-flex flex-row flex-wrap justify-content-center align-items-center gap-5 mt-5 col-9">
+          <div className="   d-flex  flex-wrap justify-content-center gap-5 mt-5 col-9 ">
             {paginatedPokemons.length > 0 ? (
               paginatedPokemons.map((pokemon) => (
                 <PokemonCard pokemon={pokemon} key={pokemon.name} />
@@ -78,7 +79,7 @@ const PokemonPage = () => {
             )}
           </div>
         </Container>
-      </div>
+      
 
       {/* Pagination */}
       <div className="d-flex align-items-center justify-content-center">

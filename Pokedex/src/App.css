@@ -1,4 +1,19 @@
 
+.shiny{
+    position: absolute;
+    top: 218px;
+    left: 490px;
+    font-size: 14px;
+    z-index:  5;
+    color: gold;
+    font-weight: bold;
+}
+
+.shiny:hover{
+    cursor: pointer;
+    transform: scale(1.1);
+}
+
 .hoverPokemon {
     width: 150px;
     position: absolute;
@@ -6,7 +21,7 @@
     transition: transform 0.2s ease-in-out; /* Pour un effet fluide */
   }
   
-  .hoverPokemon:hover {
+.hoverPokemon:hover {
     cursor: pointer;
     transform: scale(1.1);
   }

@@ -5,6 +5,7 @@ import PokemonDetail from '../Services/PokemonDetail';
 import { useEffect, useState } from 'react';
 import Pokedex from '../Components/PokedexCard';
 const PokedexPage = () => {
+    const {name} = useParams();
     const location = useLocation ();
     const [PokeDetail, setPokeDetail] = useState ({});
     
@@ -14,7 +15,7 @@ const PokedexPage = () => {
            const response = await PokemonDetail.getPokemonDetail(location.state.url)
            
            setPokeDetail(response.data);
-           console.log(response.data);
+           
            
         } catch (error) {
             console.error(error);
@@ -22,11 +23,11 @@ const PokedexPage = () => {
         }   
 
     }
-
+console.log(location)
     useEffect(() => {
         fetchPokemonDetail();
-      }, []);
-      console.log(PokeDetail);
+      }, [name]);
+      //console.log(PokeDetail);
 return <>
 <div className="pokedex-bg">
 

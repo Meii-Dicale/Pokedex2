@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import '../App.css';
 import axios from 'axios';
+import { replace, useNavigate } from 'react-router-dom';
 
 
 
@@ -13,11 +14,32 @@ function Pokedex({ PokeDetail }) {
   const stats = PokeDetail.stats;
   const types = PokeDetail.types;
   const games = PokeDetail.game_indices;
+  const cries = PokeDetail.cries?.latest;
+  
+
   const [damage, setDamage] = useState ();
   const [UrlImage , setUrlImage] = useState ("");
   const [evolve, setEvolve] = useState ();
   const [Evolution, setEvolution] = useState();
   const [Evolution2, setEvolution2] = useState();
+  const navigate = useNavigate(); 
+  const navigate2 = useNavigate();
+
+  const playSound = () => {
+    if (cries) {
+      const audioObj = new Audio(cries);
+      audioObj.play();
+    } else {
+      console.warn("No cry available for this Pokémon.");
+    }
+  };
+
+  const handleTypeClick = (typeName) => {
+    navigate(`/type/${typeName}`, { state: typeName });
+  };
+  const handleClick = (evo) => {
+    navigate2(`/pokemon/${evo}`, { state: {name: evo , url:`https://pokeapi.co/api/v2/pokemon/${evo}`} });
+  }
 
 
   const fetchPokemonType = async () => {
@@ -44,58 +66,110 @@ function Pokedex({ PokeDetail }) {
       //console.log(response.data.chain)
       setEvolution(evolutionType.data.name)
       setEvolution2(evolutionType2.data.name)
+   
+      
     }
   }
 
-console.log(Evolution)
-console.log(PokeDetail.name)
+
   useEffect(() => {
     fetchPokemonType();
     fetchPokemonEvolution();
-},[])   
+    
+},[PokeDetail])   
 
 
   return (
     <>
-      <div  >
-      <img
-      style={{
-        width: "150px",
-        position: "relative",
-        top: "210px",
-        left: "520px"
-        
-      }}
-  className="hoverPokemon"
-  src={UrlImage}
-  alt={PokeDetail.name}
-  onClick={() => {
-    if (UrlImage.includes("back"))
-      setUrlImage(
-        `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${PokeDetail.id}.png`
-      );
-    else
-      setUrlImage(
-        `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/${PokeDetail.id}.png`
-      );
-  }}
-/>
-<div
-style={{
-    position: "absolute",
-    top: "165px",
-    left: "430px",
-    fontSize: "14px",
-    zIndex: "-5"
-  
-}}>
-    <img style={{
-        width: "610px",
-    
-  
+      <div>
+  <img
+    style={{
+      width: "150px",
+      position: "relative",
+      top: "210px",
+      left: "520px"
     }}
-    src="../img/pokedex2.png" alt="pokedex" />
-</div>
+    className="hoverPokemon"
+    src={UrlImage}
+    alt={PokeDetail.name}
+    onClick={() => {
+      // Vérifie si l'URL contient "shiny"
+      const isShiny = UrlImage.includes("shiny");
+
+      // Bascule entre "back" ou non en gardant l'état "shiny"
+      if (UrlImage.includes("back")) {
+        // Si "back" est présent, on enlève "back" mais conserve l'état shiny
+        if (isShiny) {
+          setUrlImage(
+            `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/${PokeDetail.id}.png`
+          );
+        } else {
+          setUrlImage(
+            `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${PokeDetail.id}.png`
+          );
+        }
+      } else {
+        // Si "back" n'est pas présent, on ajoute "back" et conserve l'état shiny
+        if (isShiny) {
+          setUrlImage(
+            `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/shiny/${PokeDetail.id}.png`
+          );
+        } else {
+          setUrlImage(
+            `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/${PokeDetail.id}.png`
+          );
+        }
+      }
+    }}
+  />
+  <div className='shiny'
+
+    onClick={() => {
+      // Bascule entre "shiny" ou non dans l'URL
+      if (UrlImage.includes("shiny")) {
+        // Si l'URL contient "shiny", on la retire
+        if (UrlImage.includes("back")) {
+          setUrlImage(
+            `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/${PokeDetail.id}.png`
+          );
+        } else {
+          setUrlImage(
+            `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${PokeDetail.id}.png`
+          );
+        }
+      } else {
+        // Si l'URL ne contient pas "shiny", on l'ajoute
+        if (UrlImage.includes("back")) {
+          setUrlImage(
+            `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/shiny/${PokeDetail.id}.png`
+          );
+        } else {
+          setUrlImage(
+            `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/${PokeDetail.id}.png`
+          );
+        }
+      }
+    }}
+  >
+    Shiny !
+  </div>
+  <div
+    style={{
+      position: "absolute",
+      top: "165px",
+      left: "430px",
+      fontSize: "14px",
+      zIndex: "-5"
+    }}
+  >
+    <img
+      style={{
+        width: "610px",
+      }}
+      src="../img/pokedex2.png"
+      alt="pokedex"
+    />
+  </div>
       </div>
       <div
         style={{
@@ -190,6 +264,7 @@ style={{
       }}>
         {types.map((type, index) => (
           <button 
+          onClick={() => handleTypeClick(type.type.name)}
           style = {{
             borderRadius: "5px"
           }}key={index} className={type.type.name}>
@@ -240,25 +315,30 @@ style={{
 
       <h3>Weakness :</h3>
       {damage && damage.damage_relations.double_damage_from.map((doubleDamage)=> (
-                <button key={doubleDamage.name} className={doubleDamage.name}>{doubleDamage.name}</button>
+                <button key={doubleDamage.name} className={doubleDamage.name}
+                onClick={() => handleTypeClick(doubleDamage.name)}>{doubleDamage.name}
+                </button>
                 
 
               ))}
               <h3> Strong to :</h3>
               {damage && damage.damage_relations.double_damage_to.map((doubleDamage)=> (
-                <button key={doubleDamage.name} className={doubleDamage.name}>{doubleDamage.name}</button>
+                <button key={doubleDamage.name} className={doubleDamage.name}
+                onClick={() => handleTypeClick(doubleDamage.name)}>{doubleDamage.name}</button>
                 
 
               ))}
               <h3> Half damage to :</h3>
               {damage && damage.damage_relations.half_damage_to.map((doubleDamage)=> (
-                <button key={doubleDamage.name} className={doubleDamage.name}>{doubleDamage.name}</button>
+                <button key={doubleDamage.name} className={doubleDamage.name}
+                onClick={() => handleTypeClick(doubleDamage.name)}>{doubleDamage.name}</button>
                 
 
               ))}
                    <h3> Half damage from :</h3>
               {damage && damage.damage_relations.half_damage_from.map((doubleDamage)=> (
-                <button key={doubleDamage.name} className={doubleDamage.name}>{doubleDamage.name}</button>
+                <button key={doubleDamage.name} className={doubleDamage.name}
+                onClick={() => handleTypeClick(doubleDamage.name)}>{doubleDamage.name}</button>
                 
 
               ))}
@@ -273,7 +353,7 @@ style={{
     left: "1050px",
     display: "flex",
     flexDirection: "column",
-    gap: "20px", // Espacement entre les sections d'évolutions
+    gap: "20px",
   }}
 >
   {evolve?.evolves_from_species?.name && (
@@ -284,9 +364,11 @@ style={{
           width: "80px",
           height: "80px",
           margin: "10px",
+          cursor: "pointer",
         }}
         src={`https://img.pokemondb.net/artwork/${evolve.evolves_from_species.name}.jpg`}
         alt={`Evolution of ${evolve.evolves_from_species.name}`}
+        onClick={() => handleClick(evolve.evolves_from_species.name)}
       />
       <h4>{evolve.evolves_from_species.name.toUpperCase()}</h4>
     </div>
@@ -303,12 +385,12 @@ style={{
           width: "80px",
           height: "80px",
           margin: "10px",
+          cursor: "pointer",
         }}
         src={`https://img.pokemondb.net/artwork/${Evolution2}.jpg`}
         alt={`Evolution2 of ${Evolution2}`}
-        onClick={() =>
-          navigate(`/pokemon/${PokeDetail.id}`, { state: { evolutionName: Evolution2 } })
-        }
+        onClick={() => handleClick(Evolution2)}
+          
       />
       <h4>{Evolution2.toUpperCase()}</h4>
     </div>
@@ -324,22 +406,38 @@ style={{
           width: "80px",
           height: "80px",
           margin: "10px",
+          cursor: "pointer",
         }}
         src={`https://img.pokemondb.net/artwork/${Evolution}.jpg`}
         alt={`Evolution of ${Evolution}`}
-        onClick={() =>
-          navigate(`/pokemon/${PokeDetail.id}`, { state: { evolutionName: Evolution } })
-        }
+        onClick={() => handleClick(Evolution)}
       />
       <h4>{Evolution.toUpperCase()}</h4>
     </div>
   </div>
 )}
 
-</div>
-
-
-
+      </div>
+      <div
+          style={{
+            position: "absolute",
+            top: "410px",
+            left: "800px",
+            display: "flex",
+            gap: "10px",
+          }}
+        >
+          <img
+            style={{
+              width: "30px",
+              height: "30px",
+              cursor: "pointer"
+            }}
+            src="/img/sound.webp"
+            alt="Play sound"
+            onClick={playSound}
+          />
+        </div>
     </>
   );
 }
