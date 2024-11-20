@@ -41,13 +41,14 @@ function Pokedex({ PokeDetail }) {
       const response = await axios.get(evolve.evolution_chain.url);
       const evolutionType = await axios.get(response.data.chain.evolves_to[0].evolves_to[0].species.url);
       const evolutionType2 = await axios.get(response.data.chain.evolves_to[0].species.url)
-      console.log(response.data.chain)
+      //console.log(response.data.chain)
       setEvolution(evolutionType.data.name)
       setEvolution2(evolutionType2.data.name)
     }
   }
 
-
+console.log(Evolution)
+console.log(PokeDetail.name)
   useEffect(() => {
     fetchPokemonType();
     fetchPokemonEvolution();
@@ -218,7 +219,7 @@ style={{
         width : "450px"
         
       }}>
-        <h5>Includes in games :</h5>
+        <h5>Included in games :</h5>
       {games.map((game, index) => (
           <button 
           style = {{
@@ -272,10 +273,11 @@ style={{
     left: "1050px",
     display: "flex",
     flexDirection: "column",
+    gap: "20px", // Espacement entre les sections d'évolutions
   }}
 >
   {evolve?.evolves_from_species?.name && (
-    <>
+    <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
       <h3>I am the evolution of:</h3>
       <img
         style={{
@@ -287,23 +289,13 @@ style={{
         alt={`Evolution of ${evolve.evolves_from_species.name}`}
       />
       <h4>{evolve.evolves_from_species.name.toUpperCase()}</h4>
-    </>
+    </div>
   )}
-      </div><div style={{
-        display: "flex",
-        flexDirection: "column",
 
-      }}>
-      <div style={{
-        position: "absolute",
-        top: "450px",
-        left: "1050px",
-        display: "flex",
-        flexDirection: "column",
-        gap: "10px",    
-      }}>
-{Evolution2 && PokeDetail && Evolution2 !== PokeDetail.name && (
-  <>
+{(Evolution2 &&
+  ((evolve?.evolves_from_species?.name && Evolution2 !== evolve.evolves_from_species.name) ||
+   (Evolution2 !== PokeDetail.name))) && (
+  <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
     <h3>I can evolve into:</h3>
     <div>
       <img
@@ -313,16 +305,18 @@ style={{
           margin: "10px",
         }}
         src={`https://img.pokemondb.net/artwork/${Evolution2}.jpg`}
-        alt={`Evolution of ${Evolution2}`}
-        onClick={() => navigate(`/pokemon/${PokeDetail.id}`, { state: { evolutionName: Evolution2 } })}
+        alt={`Evolution2 of ${Evolution2}`}
+        onClick={() =>
+          navigate(`/pokemon/${PokeDetail.id}`, { state: { evolutionName: Evolution2 } })
+        }
       />
       <h4>{Evolution2.toUpperCase()}</h4>
     </div>
-  </>
+  </div>
 )}
 
-{Evolution && PokeDetail && Evolution !== PokeDetail.name && (
-  <>
+{(Evolution && PokeDetail && Evolution !== PokeDetail.name) && (
+  <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
     <h3>I can evolve into:</h3>
     <div>
       <img
@@ -333,16 +327,18 @@ style={{
         }}
         src={`https://img.pokemondb.net/artwork/${Evolution}.jpg`}
         alt={`Evolution of ${Evolution}`}
-        onClick={() => navigate(`/pokemon/${PokeDetail.id}`, { state: { evolutionName: Evolution } })}
+        onClick={() =>
+          navigate(`/pokemon/${PokeDetail.id}`, { state: { evolutionName: Evolution } })
+        }
       />
-      <h4>{Evolution2.toUpperCase()}</h4>
+      <h4>{Evolution.toUpperCase()}</h4>
     </div>
-  </>
+  </div>
 )}
 
+</div>
 
-      </div>
-      </div>
+
 
     </>
   );

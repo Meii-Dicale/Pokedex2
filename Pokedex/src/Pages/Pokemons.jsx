@@ -1,107 +1,126 @@
 import { useEffect, useState } from "react";
-import { useSearchParams } from "react-router-dom"; // Importez useSearchParams
 import PokemonService from "../Services/PokemonService";
 import PokemonCard from "../Components/PokemonCard";
 import Container from "react-bootstrap/esm/Container";
 import Pagination from "react-bootstrap/esm/Pagination";
+import Form from "react-bootstrap/esm/Form";
 
 const PokemonPage = () => {
-  const [currentPage, setCurrentPage] = useState(1);
-  const [limit, setLimit] = useState(200);
-  const [maxPage, setMaxPage] = useState(250);
   const [pokemons, setPokemons] = useState([]);
-  const [searchParams] = useSearchParams(); // Utilisez les paramètres de recherche
-  const searchQuery = searchParams.get("search"); // Récupérez le terme de recherche
+  const [filteredPokemons, setFilteredPokemons] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [maxPage, setMaxPage] = useState(1);
+  const [limit] = useState(21);
 
-  const fetchPokemons = async () => {
+  const fetchAllPokemons = async () => {
     try {
-       
-      if (searchQuery) {
-        // Si une recherche est active
-        const response = await PokemonService.searchPokemonByName(searchQuery);
-        setPokemons(response ? [response] : []); // Met à jour avec le Pokémon trouvé ou vide
-        setMaxPage(1); // Une seule page en cas de recherche
-      } else {
-        // Si aucune recherche, on charge les Pokémons par page
-        const offset = (currentPage - 1) * limit;
-        const response = await PokemonService.getAllPokemons(offset, limit);
-        setPokemons(response.data.results);
-        setMaxPage(Math.ceil(response.data.count / limit));
-        console.log(response.data.results)
-      }
-      
+      // Récupérer tous les Pokémon (jusqu'à 1000)
+      const response = await PokemonService.getAllPokemons(0, 1000);
+      setPokemons(response.data.results);
+      setFilteredPokemons(response.data.results); // Par défaut, tous les Pokémon
+      setMaxPage(Math.ceil(response.data.results.length / limit));
     } catch (error) {
       console.error(error);
     }
   };
 
+  // Charger tous les Pokémon au démarrage
   useEffect(() => {
-    fetchPokemons();
-  }, [currentPage, searchQuery]); // Recharger lors d'un changement de page ou de recherche
+    fetchAllPokemons();
+  }, []);
+
+  // Gestion de la recherche
+  useEffect(() => {
+    const lowerCaseQuery = searchQuery.toLowerCase();
+    const filtered = pokemons.filter((pokemon) =>
+      pokemon.name.toLowerCase().includes(lowerCaseQuery)
+    );
+    setFilteredPokemons(filtered);
+    setMaxPage(Math.ceil(filtered.length / limit)); // Recalcule le nombre max de pages
+    setCurrentPage(1); // Reset la pagination si on effectue une recherche
+  }, [searchQuery, pokemons, limit]);
+
+  // Gestion des Pokémon affichés par page
+  const paginatedPokemons = filteredPokemons.slice(
+    (currentPage - 1) * limit,
+    currentPage * limit
+  );
+
+  // Gestion du changement de page
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+  };
 
   return (
     <>
       <div className="background-container">
-        <Container className="d-flex align-item-center justify-content-center"> 
-          <div className="d-flex flex-row flex-wrap justify-content-center align-item-center gap-5 mt-5 col-9">
-            {pokemons.length > 0 ? (
-              pokemons.map((pokemon) => (
+        <Container>
+          {/* Barre de recherche */}
+          <div className="d-flex justify-content-center mt-4">
+            <Form.Control
+              type="text"
+              placeholder="Rechercher un Pokémon..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="search-bar w-50"
+            />
+          </div>
+
+          {/* Liste des Pokémon */}
+          <div className="d-flex flex-row flex-wrap justify-content-center align-items-center gap-5 mt-5 col-9">
+            {paginatedPokemons.length > 0 ? (
+              paginatedPokemons.map((pokemon) => (
                 <PokemonCard pokemon={pokemon} key={pokemon.name} />
               ))
             ) : (
-              <p>Aucun Pokémon trouvé</p>
+              <p className="text-center mt-5">Aucun Pokémon trouvé</p>
             )}
           </div>
         </Container>
       </div>
-<div className="d-flex align-item-center justify-content-center">
-      {!searchQuery && (
+
+      {/* Pagination */}
+      <div className="d-flex align-items-center justify-content-center">
         <Pagination className="mt-5">
           {currentPage > 1 && (
             <>
-              <Pagination.First onClick={() => setCurrentPage(1)} />
-              <Pagination.Prev onClick={() => setCurrentPage(currentPage - 1)} />
-              <Pagination.Item onClick={() => setCurrentPage(1)}>
-                {1}
-              </Pagination.Item>
+              <Pagination.First onClick={() => handlePageChange(1)} />
+              <Pagination.Prev
+                onClick={() => handlePageChange(currentPage - 1)}
+              />
+              {currentPage > 2 && (
+                <Pagination.Item onClick={() => handlePageChange(1)}>
+                  1
+                </Pagination.Item>
+              )}
             </>
           )}
-
-          {currentPage - 5 > 0 && (
-            <Pagination.Ellipsis
-              onClick={() => setCurrentPage(currentPage - 5)}
-            />
-          )}
-          {currentPage !== 2 && currentPage > 1 && (
-            <Pagination.Item onClick={() => setCurrentPage(currentPage - 1)}>
+          {currentPage > 3 && <Pagination.Ellipsis />}
+          {currentPage > 1 && (
+            <Pagination.Item onClick={() => handlePageChange(currentPage - 1)}>
               {currentPage - 1}
             </Pagination.Item>
           )}
-
           <Pagination.Item active>{currentPage}</Pagination.Item>
-
-          {currentPage + 1 < maxPage && (
-            <Pagination.Item onClick={() => setCurrentPage(currentPage + 1)}>
+          {currentPage < maxPage && (
+            <Pagination.Item onClick={() => handlePageChange(currentPage + 1)}>
               {currentPage + 1}
             </Pagination.Item>
           )}
-
-          {currentPage + 5 <= maxPage && (
-            <Pagination.Ellipsis
-              onClick={() => setCurrentPage(currentPage + 5)}
-            />
-          )}
+          {currentPage < maxPage - 2 && <Pagination.Ellipsis />}
           {currentPage < maxPage && (
             <>
-              <Pagination.Item onClick={() => setCurrentPage(maxPage)}>
+              <Pagination.Item onClick={() => handlePageChange(maxPage)}>
                 {maxPage}
               </Pagination.Item>
-              <Pagination.Next onClick={() => setCurrentPage(currentPage + 1)} />
-              <Pagination.Last onClick={() => setCurrentPage(maxPage)} />
+              <Pagination.Next
+                onClick={() => handlePageChange(currentPage + 1)}
+              />
+              <Pagination.Last onClick={() => handlePageChange(maxPage)} />
             </>
           )}
         </Pagination>
-      )}
       </div>
     </>
   );

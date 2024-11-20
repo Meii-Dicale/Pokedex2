@@ -17,6 +17,10 @@
     left: 10px; /* Décale vers la droite */ ;
 }
 
+.card:hover {
+    cursor: pointer;
+    transform: scale(1.1);
+}
 
 .text-animation {
     display: inline-block;
