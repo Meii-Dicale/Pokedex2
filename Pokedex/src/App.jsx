@@ -5,6 +5,7 @@ import NavBar from './Components/NavBar';
 import PokemonPage from './Pages/Pokemons';
 import PokedexPage from './Pages/Pokedex';
 import TypePage from './Pages/Types';
+import GenerationPage from './Pages/Generation';
 
 
 
@@ -17,6 +18,7 @@ function App() {
               <Route path="/pokemons" element={<PokemonPage />} />
               <Route path="/pokemon/:name" element={<PokedexPage />} />
               <Route path="/type/:type" element={<TypePage/>} />
+              <Route path="/generation/:generation" element={ <GenerationPage/>} />
               
               </Routes>
           </BrowserRouter >
